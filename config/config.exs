@@ -9,12 +9,8 @@ if Mix.env() != :prod do
     hooks: [
       pre_commit: [
         tasks: [
-          "mix format"
-        ]
-      ],
-      pre_push: [
-        verbose: false,
-        tasks: [
+          "mix format",
+          "mix credo --strict",
           "mix dialyzer",
           "mix test",
           "echo 'success!'"

@@ -1,4 +1,6 @@
 defmodule SocialNetworkingKata.MixProject do
+  @moduledoc false
+
   use Mix.Project
 
   def project do
@@ -28,6 +30,7 @@ defmodule SocialNetworkingKata.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:git_hooks, "~> 0.4.2", only: [:test, :dev], runtime: false}
     ]
