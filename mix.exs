@@ -13,7 +13,7 @@ defmodule SocialNetworkingKata.MixProject do
         plt_add_deps: :app_tree,
         plt_add_apps: [],
         flags: [:error_handling, :underspecs, :unknown, :unmatched_returns]
-      ],
+      ]
     ]
   end
 
