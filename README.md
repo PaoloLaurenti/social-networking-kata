@@ -1,0 +1,3 @@
+# SocialNetworkingKata
+
+**TODO: Add description**
