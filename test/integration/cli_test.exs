@@ -13,7 +13,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
 
   setup :verify_on_exit!
 
-  test "exit from Cli" do
+  test "CLI stops after exit command" do
     output =
       capture_io([input: "exit", capture_prompt: false], fn ->
         SocialNetworkingKata.Cli.main([])
@@ -22,7 +22,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
     assert output == "bye\n"
   end
 
-  test "continue to run after unrecognized message" do
+  test "CLI continues to run after unrecognized message" do
     output =
       capture_io([input: "dsfasdgsg\nexit", capture_prompt: false], fn ->
         SocialNetworkingKata.Cli.main([])
@@ -31,7 +31,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
     assert output == "sorry \"dsfasdgsg\" is an unknown command\nbye\n"
   end
 
-  test "publish message to the social network" do
+  test "CLI publishes messages to the social network" do
     defmock(SocialNetworkServerMock, for: SocialNetwork)
     defmock(ClockMock, for: Clock)
     publish_message_sent_at = DateTime.now!("Etc/UTC")
