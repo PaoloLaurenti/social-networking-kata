@@ -12,7 +12,6 @@ if Mix.env() != :prod do
           "mix format",
           "mix credo --strict",
           "mix dialyzer",
-          "mix test",
           "echo 'success!'"
         ]
       ]

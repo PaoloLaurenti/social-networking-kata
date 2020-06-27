@@ -15,7 +15,8 @@ defmodule SocialNetworkingKata.MixProject do
         plt_add_deps: :app_tree,
         plt_add_apps: [],
         flags: [:error_handling, :underspecs, :unknown, :unmatched_returns]
-      ]
+      ],
+      escript: escript()
     ]
   end
 
@@ -32,7 +33,13 @@ defmodule SocialNetworkingKata.MixProject do
     [
       {:credo, "~> 1.4", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:git_hooks, "~> 0.4.2", only: [:test, :dev], runtime: false}
+      {:git_hooks, "~> 0.4.2", only: [:dev, :test], runtime: false},
+      {:hammox, "~> 0.2", only: :test},
+      {:domo, "~> 1.0"}
     ]
+  end
+
+  defp escript do
+    [main_module: SocialNetwork.Cli]
   end
 end
