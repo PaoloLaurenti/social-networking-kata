@@ -6,7 +6,7 @@ defmodule SocialNetworkingKata.Test.E2e.CliTest do
   test "view user timeline" do
     timeline_output =
       capture_io("Alice -> I love the weather today\nAlice\nexit", fn ->
-        SocialNetworkingKata.Cli.main(nil)
+        SocialNetworkingKata.Cli.main()
       end)
 
     assert timeline_output == "I love the weather today (1 minutes ago)"

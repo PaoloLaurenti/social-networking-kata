@@ -10,7 +10,7 @@ defmodule SocialNetworkingKata.Cli do
   alias SocialNetworkingKata.VolatileSocialNetwork
 
   @spec main(args :: keyword()) :: :ok
-  def main(args) do
+  def main(args \\ []) do
     social_network = Keyword.get(args, :social_network, VolatileSocialNetwork)
     clock = Keyword.get(args, :clock, UTCClock)
     loop(social_network, clock)

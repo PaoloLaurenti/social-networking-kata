@@ -16,7 +16,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
   test "CLI stops after exit command" do
     output =
       capture_io([input: "exit", capture_prompt: false], fn ->
-        SocialNetworkingKata.Cli.main([])
+        SocialNetworkingKata.Cli.main()
       end)
 
     assert output == "bye\n"
@@ -25,7 +25,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
   test "CLI continues to run after unrecognized message" do
     output =
       capture_io([input: "dsfasdgsg\nexit", capture_prompt: false], fn ->
-        SocialNetworkingKata.Cli.main([])
+        SocialNetworkingKata.Cli.main()
       end)
 
     assert output == "sorry \"dsfasdgsg\" is an unknown command\nbye\n"
