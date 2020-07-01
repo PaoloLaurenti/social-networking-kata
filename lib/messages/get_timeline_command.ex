@@ -4,9 +4,10 @@ defmodule SocialNetworkingKata.Messages.GetTimelineCommand do
   """
 
   use Domo
+  alias SocialNetworkingKata.User
 
   @typedoc "A timeline command"
   typedstruct do
-    field :message, String.t()
+    field :user, User.t()
   end
 end

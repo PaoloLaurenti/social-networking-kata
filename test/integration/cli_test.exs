@@ -1,17 +1,15 @@
 defmodule SocialNetworkingKata.Test.Integration.CliTest do
   @moduledoc false
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   import ExUnit.CaptureIO
   import Mox
 
-  alias SocialNetworkingKata.Clock
   alias SocialNetworkingKata.Message
+  alias SocialNetworkingKata.Messages.GetTimelineCommand
   alias SocialNetworkingKata.Messages.PublishCommand
-  alias SocialNetworkingKata.SocialNetwork
+  alias SocialNetworkingKata.Timeline
   alias SocialNetworkingKata.User
-
-  setup :verify_on_exit!
 
   test "CLI stops after exit command" do
     output =
@@ -22,22 +20,21 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
     assert output == "bye\n"
   end
 
-  test "CLI continues to run after unrecognized message" do
-    output =
-      capture_io([input: "dsfasdgsg\nexit", capture_prompt: false], fn ->
-        SocialNetworkingKata.Cli.main()
-      end)
+  # test "CLI continues to run after unrecognized message" do
+  #   output =
+  #     capture_io([input: "dsfasdgsg\nexit", capture_prompt: false], fn ->
+  #       SocialNetworkingKata.Cli.main()
+  #     end)
 
-    assert output == "sorry \"dsfasdgsg\" is an unknown command\nbye\n"
-  end
+  #   assert output == "sorry \"dsfasdgsg\" is an unknown command\nbye\n"
+  # end
 
   test "CLI publishes messages to the social network" do
-    defmock(SocialNetworkServerMock, for: SocialNetwork)
-    defmock(ClockMock, for: Clock)
     publish_message_sent_at = DateTime.now!("Etc/UTC")
+    test_pid = self()
 
     stub(SocialNetworkServerMock, :run, fn cmd ->
-      send(self(), cmd)
+      send(test_pid, cmd)
       :ok
     end)
 
@@ -57,5 +54,39 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
       )
 
     assert_receive ^expected_publish_command
+  end
+
+  test "CLI gets user timeline from social network" do
+    # defmock(SocialNetworkServerMock, for: SocialNetwork)
+    now = DateTime.now!("Etc/UTC")
+    four_minutes_and_something_ago = DateTime.add(now, -250, :second)
+    less_than_one_minute_ago = DateTime.add(now, -45, :second)
+
+    stub(SocialNetworkServerMock, :run, fn cmd ->
+      send(self(), cmd)
+
+      {:ok,
+       Timeline.new!(
+         user: User.new!(name: "Alice"),
+         messages: [
+           Message.new!(text: "Some older message", sent_at: four_minutes_and_something_ago),
+           Message.new!(text: "Some recent message", sent_at: less_than_one_minute_ago)
+         ]
+       )}
+    end)
+
+    output =
+      capture_io(
+        [input: "Alice\nexit", capture_prompt: false],
+        fn ->
+          SocialNetworkingKata.Cli.main(social_network: SocialNetworkServerMock)
+        end
+      )
+
+    expected_timeline_command = GetTimelineCommand.new!(user: User.new!(name: "Alice"))
+    assert_receive ^expected_timeline_command
+
+    assert output ==
+             "Some recent message (1 minute ago)\nSome older message (5 minutes ago)\nbye\n"
   end
 end

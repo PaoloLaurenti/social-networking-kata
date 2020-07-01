@@ -10,6 +10,7 @@ defmodule SocialNetworkingKata.MixProject do
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      aliases: aliases(),
       dialyzer: [
         plt_file: {:no_warn, "_build/dialyzer.plt"},
         plt_add_deps: :app_tree,
@@ -23,8 +24,8 @@ defmodule SocialNetworkingKata.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
-      mod: {SocialNetworkingKata.Application, []}
+      extra_applications: [:logger]
+      # mod: {SocialNetworkingKata.Application, []}
     ]
   end
 
@@ -41,5 +42,11 @@ defmodule SocialNetworkingKata.MixProject do
 
   defp escript do
     [main_module: SocialNetwork.Cli]
+  end
+
+  defp aliases do
+    [
+      test: "test --no-start"
+    ]
   end
 end

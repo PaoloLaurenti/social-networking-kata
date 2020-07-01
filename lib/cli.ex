@@ -4,7 +4,9 @@ defmodule SocialNetworkingKata.Cli do
   """
   alias SocialNetworkingKata.Message
   alias SocialNetworkingKata.Message
+  alias SocialNetworkingKata.Messages.GetTimelineCommand
   alias SocialNetworkingKata.Messages.PublishCommand
+  alias SocialNetworkingKata.Timeline
   alias SocialNetworkingKata.User
   alias SocialNetworkingKata.UTCClock
   alias SocialNetworkingKata.VolatileSocialNetwork
@@ -24,7 +26,10 @@ defmodule SocialNetworkingKata.Cli do
 
     case cmd do
       {:cmd, cmd} ->
-        _result = social_network.run(cmd)
+        social_network.run(cmd)
+        |> to_text
+        |> Enum.each(&IO.puts/1)
+
         loop(social_network, clock)
 
       :not_recognized ->
@@ -42,7 +47,12 @@ defmodule SocialNetworkingKata.Cli do
     publish_message_data =
       Regex.named_captures(~r/^(?<name>[^\s]+)\s->\s(?<text>.+)$/, text_command)
 
+    get_timeline_data = Regex.named_captures(~r/^(?<name>[^\s]+)$/, text_command)
+
     cond do
+      text_command == "exit" ->
+        :exit
+
       publish_message_data != nil ->
         {:cmd,
          PublishCommand.new!(
@@ -54,11 +64,33 @@ defmodule SocialNetworkingKata.Cli do
              )
          )}
 
-      text_command == "exit" ->
-        :exit
+      get_timeline_data != nil ->
+        {:cmd, GetTimelineCommand.new!(user: User.new!(name: get_timeline_data["name"]))}
 
       true ->
         :not_recognized
     end
+  end
+
+  defp to_text(:ok), do: [""]
+
+  defp to_text({:ok, timeline = %Timeline{}}) do
+    timeline.messages
+    |> Enum.sort_by(fn m -> m.sent_at end, :desc)
+    |> Enum.map(&to_text/1)
+  end
+
+  defp to_text(%Message{} = message) do
+    minutes_ago =
+      (DateTime.diff(DateTime.now!("Etc/UTC"), message.sent_at) / 60) |> Float.ceil() |> trunc
+
+    minute_s =
+      if minutes_ago == 1 do
+        "minute"
+      else
+        "minutes"
+      end
+
+    "#{message.text} (#{minutes_ago} #{minute_s} ago)"
   end
 end
