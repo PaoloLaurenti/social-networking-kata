@@ -20,15 +20,6 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
     assert output == "bye\n"
   end
 
-  # test "CLI continues to run after unrecognized message" do
-  #   output =
-  #     capture_io([input: "dsfasdgsg\nexit", capture_prompt: false], fn ->
-  #       SocialNetworkingKata.Cli.main()
-  #     end)
-
-  #   assert output == "sorry \"dsfasdgsg\" is an unknown command\nbye\n"
-  # end
-
   test "CLI publishes messages to the social network" do
     publish_message_sent_at = DateTime.now!("Etc/UTC")
     test_pid = self()

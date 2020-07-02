@@ -6,6 +6,7 @@ defmodule SocialNetworkingKata.Cli do
   alias SocialNetworkingKata.Message
   alias SocialNetworkingKata.Messages.GetTimelineCommand
   alias SocialNetworkingKata.Messages.PublishCommand
+  alias SocialNetworkingKata.SocialNetwork
   alias SocialNetworkingKata.Timeline
   alias SocialNetworkingKata.User
   alias SocialNetworkingKata.UTCClock
@@ -42,7 +43,7 @@ defmodule SocialNetworkingKata.Cli do
   end
 
   @spec parse(text_command :: String.t(), clock :: Module) ::
-          {:cmd, PublishCommand.t()} | :exit | :not_recognized
+          {:cmd, SocialNetwork.commands()} | :exit | :not_recognized
   defp parse(text_command, clock) do
     publish_message_data =
       Regex.named_captures(~r/^(?<name>[^\s]+)\s->\s(?<text>.+)$/, text_command)
@@ -72,6 +73,7 @@ defmodule SocialNetworkingKata.Cli do
     end
   end
 
+  @spec to_text(SocialNetwork.commands() | Message.t()) :: String.t() | [String.t(), ...]
   defp to_text(:ok), do: [""]
 
   defp to_text({:ok, timeline = %Timeline{}}) do

@@ -6,6 +6,8 @@ defmodule SocialNetworkingKata.SocialNetwork do
   alias SocialNetworkingKata.Messages.PublishCommand
   alias SocialNetworkingKata.Timeline
 
+  @type commands :: PublishCommand.t() | GetTimelineCommand.t()
+
   @callback run(cmd :: PublishCommand.t()) :: :ok
   @callback run(cmd :: GetTimelineCommand.t()) :: {:ok, Timeline.t()}
 end
