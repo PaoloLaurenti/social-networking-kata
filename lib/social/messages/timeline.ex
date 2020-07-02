@@ -1,11 +1,11 @@
-defmodule SocialNetworkingKata.Timeline do
+defmodule SocialNetworkingKata.Social.Messages.Timeline do
   @moduledoc """
   A struct representing an user timeline.
   """
 
   use Domo
-  alias SocialNetworkingKata.Message
-  alias SocialNetworkingKata.User
+  alias SocialNetworkingKata.Social.Messages.Message
+  alias SocialNetworkingKata.Social.Users.User
 
   @typedoc "An user timeline"
   typedstruct do

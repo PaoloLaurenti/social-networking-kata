@@ -5,11 +5,11 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
   import ExUnit.CaptureIO
   import Mox
 
-  alias SocialNetworkingKata.Message
-  alias SocialNetworkingKata.Messages.GetTimelineCommand
-  alias SocialNetworkingKata.Messages.PublishCommand
-  alias SocialNetworkingKata.Timeline
-  alias SocialNetworkingKata.User
+  alias SocialNetworkingKata.Social.Messages.Message
+  alias SocialNetworkingKata.Social.Messages.PublishMessage
+  alias SocialNetworkingKata.Social.Messages.Timeline
+  alias SocialNetworkingKata.Social.Users.User
+  alias SocialNetworkingKata.Social.Users.Users.GetTimeline
 
   test "CLI stops after exit command" do
     output =
@@ -39,7 +39,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
     )
 
     expected_publish_command =
-      PublishCommand.new!(
+      PublishMessage.new!(
         user: User.new!(name: "Alice"),
         message: Message.new!(text: "I love the weather today", sent_at: publish_message_sent_at)
       )
@@ -48,7 +48,6 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
   end
 
   test "CLI gets user timeline from social network" do
-    # defmock(SocialNetworkServerMock, for: SocialNetwork)
     now = DateTime.now!("Etc/UTC")
     four_minutes_and_something_ago = DateTime.add(now, -250, :second)
     less_than_one_minute_ago = DateTime.add(now, -45, :second)
@@ -74,7 +73,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
         end
       )
 
-    expected_timeline_command = GetTimelineCommand.new!(user: User.new!(name: "Alice"))
+    expected_timeline_command = GetTimeline.new!(user: User.new!(name: "Alice"))
     assert_receive ^expected_timeline_command
 
     assert output ==

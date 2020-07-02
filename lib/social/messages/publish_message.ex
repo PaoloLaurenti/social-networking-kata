@@ -1,11 +1,11 @@
-defmodule SocialNetworkingKata.Messages.PublishCommand do
+defmodule SocialNetworkingKata.Social.Messages.PublishMessage do
   @moduledoc """
   A struct representing the command to use to publish a message into an user timeline.
   """
 
   use Domo
-  alias SocialNetworkingKata.Message
-  alias SocialNetworkingKata.User
+  alias SocialNetworkingKata.Social.Messages.Message
+  alias SocialNetworkingKata.Social.Users.User
 
   @typedoc "A publish command"
   typedstruct do

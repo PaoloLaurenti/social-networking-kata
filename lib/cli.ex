@@ -2,15 +2,14 @@ defmodule SocialNetworkingKata.Cli do
   @moduledoc """
   The Cli of the Social Network
   """
-  alias SocialNetworkingKata.Message
-  alias SocialNetworkingKata.Message
-  alias SocialNetworkingKata.Messages.GetTimelineCommand
-  alias SocialNetworkingKata.Messages.PublishCommand
-  alias SocialNetworkingKata.SocialNetwork
-  alias SocialNetworkingKata.Timeline
-  alias SocialNetworkingKata.User
+  alias SocialNetworkingKata.Social.Messages.Message
+  alias SocialNetworkingKata.Social.Messages.PublishMessage
+  alias SocialNetworkingKata.Social.Messages.Timeline
+  alias SocialNetworkingKata.Social.SocialNetwork
+  alias SocialNetworkingKata.Social.Users.User
+  alias SocialNetworkingKata.Social.Users.Users.GetTimeline
+  alias SocialNetworkingKata.Social.VolatileSocialNetwork
   alias SocialNetworkingKata.UTCClock
-  alias SocialNetworkingKata.VolatileSocialNetwork
 
   @spec main(args :: keyword()) :: :ok
   def main(args \\ []) do
@@ -56,7 +55,7 @@ defmodule SocialNetworkingKata.Cli do
 
       publish_message_data != nil ->
         {:cmd,
-         PublishCommand.new!(
+         PublishMessage.new!(
            user: User.new!(name: publish_message_data["name"]),
            message:
              Message.new!(
@@ -66,7 +65,7 @@ defmodule SocialNetworkingKata.Cli do
          )}
 
       get_timeline_data != nil ->
-        {:cmd, GetTimelineCommand.new!(user: User.new!(name: get_timeline_data["name"]))}
+        {:cmd, GetTimeline.new!(user: User.new!(name: get_timeline_data["name"]))}
 
       true ->
         :not_recognized

@@ -1,10 +1,10 @@
-defmodule SocialNetworkingKata.Messages.GetTimelineCommand do
+defmodule SocialNetworkingKata.Social.Users.Users.GetTimeline do
   @moduledoc """
   A struct representing the command to use to retrieve an user timeline.
   """
 
   use Domo
-  alias SocialNetworkingKata.User
+  alias SocialNetworkingKata.Social.Users.User
 
   @typedoc "A timeline command"
   typedstruct do

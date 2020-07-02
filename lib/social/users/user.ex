@@ -1,4 +1,4 @@
-defmodule SocialNetworkingKata.User do
+defmodule SocialNetworkingKata.Social.Users.User do
   @moduledoc """
   A struct representing an user.
   """

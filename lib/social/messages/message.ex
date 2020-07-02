@@ -1,4 +1,4 @@
-defmodule SocialNetworkingKata.Message do
+defmodule SocialNetworkingKata.Social.Messages.Message do
   @moduledoc """
   A struct representing a message.
   """
