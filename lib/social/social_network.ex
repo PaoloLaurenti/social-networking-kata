@@ -4,7 +4,7 @@ defmodule SocialNetworkingKata.Social.SocialNetwork do
   """
   alias SocialNetworkingKata.Social.Messages.PublishMessage
   alias SocialNetworkingKata.Social.Messages.Timeline
-  alias SocialNetworkingKata.Social.Users.Users.GetTimeline
+  alias SocialNetworkingKata.Social.Users.GetTimeline
 
   @type commands :: PublishMessage.t() | GetTimeline.t()
 

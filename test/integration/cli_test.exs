@@ -8,8 +8,8 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
   alias SocialNetworkingKata.Social.Messages.Message
   alias SocialNetworkingKata.Social.Messages.PublishMessage
   alias SocialNetworkingKata.Social.Messages.Timeline
+  alias SocialNetworkingKata.Social.Users.GetTimeline
   alias SocialNetworkingKata.Social.Users.User
-  alias SocialNetworkingKata.Social.Users.Users.GetTimeline
 
   test "CLI stops after exit command" do
     output =

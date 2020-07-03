@@ -6,8 +6,8 @@ defmodule SocialNetworkingKata.Cli do
   alias SocialNetworkingKata.Social.Messages.PublishMessage
   alias SocialNetworkingKata.Social.Messages.Timeline
   alias SocialNetworkingKata.Social.SocialNetwork
+  alias SocialNetworkingKata.Social.Users.GetTimeline
   alias SocialNetworkingKata.Social.Users.User
-  alias SocialNetworkingKata.Social.Users.Users.GetTimeline
   alias SocialNetworkingKata.Social.VolatileSocialNetwork
   alias SocialNetworkingKata.UTCClock
 
