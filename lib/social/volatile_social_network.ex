@@ -2,12 +2,10 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
   @moduledoc """
   The Social Network engine
   """
-  alias SocialNetworkingKata.Social.Messages.Message
   alias SocialNetworkingKata.Social.Messages.PublishMessage
   alias SocialNetworkingKata.Social.Messages.Timeline
   alias SocialNetworkingKata.Social.SocialNetwork
   alias SocialNetworkingKata.Social.Users.GetTimeline
-  alias SocialNetworkingKata.Social.Users.User
 
   @behaviour SocialNetwork
 
@@ -16,11 +14,7 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
     :ok
   end
 
-  def run(%GetTimeline{} = _cmd) do
-    {:ok,
-     %Timeline{
-       user: %User{name: ""},
-       messages: [%Message{text: "", sent_at: DateTime.now!("Etc/UTC")}]
-     }}
+  def run(%GetTimeline{user: user} = _cmd) do
+    {:ok, %Timeline{user: user, messages: []}}
   end
 end
