@@ -1,4 +1,4 @@
-defmodule SocialNetworkingKata.Clock do
+defmodule SocialNetworkingKata.Time.Clock do
   @moduledoc """
   The behaviour that defines the clock of the social network
   """

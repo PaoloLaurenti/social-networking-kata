@@ -1,4 +1,4 @@
-defmodule SocialNetworkingKata.Social.VolatileMessagesRepository do
+defmodule SocialNetworkingKata.Social.Messages.VolatileMessagesRepository do
   @moduledoc """
   The volatile repository of all the messages of the Social Network
   """

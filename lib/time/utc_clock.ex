@@ -1,8 +1,8 @@
-defmodule SocialNetworkingKata.UTCClock do
+defmodule SocialNetworkingKata.Time.UTCClock do
   @moduledoc """
   The clock of the social network in UTC time zone
   """
-  @behaviour SocialNetworkingKata.Clock
+  @behaviour SocialNetworkingKata.Time.Clock
 
   @spec get_current_datetime :: {:ok, DateTime.t()}
   def get_current_datetime do

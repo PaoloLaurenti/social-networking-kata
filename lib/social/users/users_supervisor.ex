@@ -4,8 +4,8 @@ defmodule SocialNetworkingKata.Social.Users.UsersSupervisor do
   """
   use Supervisor
   alias SocialNetworkingKata.ServicesNamesResolver
+  alias SocialNetworkingKata.Social.Messages.VolatileMessagesRepository
   alias SocialNetworkingKata.Social.Users.User
-  alias SocialNetworkingKata.Social.VolatileMessagesRepository
 
   @spec start_link(keyword()) ::
           {:ok, pid()} | {:error, {:already_started, pid()} | {:shutdown, term()} | term()}

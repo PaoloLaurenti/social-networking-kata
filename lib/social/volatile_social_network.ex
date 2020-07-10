@@ -3,13 +3,13 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
   The Social Network implementation that does not persist anything
   """
   alias SocialNetworkingKata.Social.Messages.Message
+  alias SocialNetworkingKata.Social.Messages.VolatileMessagesRepository
   alias SocialNetworkingKata.Social.Publishing.Message, as: MessageToPublish
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
   alias SocialNetworkingKata.Social.SocialNetwork
   alias SocialNetworkingKata.Social.SocialNetworkSupervisor
   alias SocialNetworkingKata.Social.Timeline
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
-  alias SocialNetworkingKata.Social.VolatileMessagesRepository
 
   @behaviour SocialNetwork
 
@@ -23,7 +23,7 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
         %PublishMessageRequest{user: user, message: %MessageToPublish{text: message_text}},
         opts
       ) do
-    clock = Keyword.get(opts, :clock, SocialNetworkingKata.UTCClock)
+    clock = Keyword.get(opts, :clock, SocialNetworkingKata.Time.UTCClock)
     {:ok, now} = clock.get_current_datetime()
     res = SocialNetworkSupervisor.start_user(user)
 
