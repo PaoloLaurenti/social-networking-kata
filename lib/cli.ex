@@ -3,47 +3,67 @@ defmodule SocialNetworkingKata.Cli do
   The Cli of the Social Network
   """
   alias SocialNetworkingKata.Social.Messages.Message
-  alias SocialNetworkingKata.Social.Messages.PublishMessage
-  alias SocialNetworkingKata.Social.Messages.Timeline
+  alias SocialNetworkingKata.Social.Publishing.Message, as: MessageToPublish
+  alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
   alias SocialNetworkingKata.Social.SocialNetwork
-  alias SocialNetworkingKata.Social.Users.GetTimeline
+  alias SocialNetworkingKata.Social.Timeline
+  alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
   alias SocialNetworkingKata.Social.Users.User
   alias SocialNetworkingKata.Social.VolatileSocialNetwork
-  alias SocialNetworkingKata.UTCClock
 
   @spec main(args :: keyword()) :: :ok
   def main(args \\ []) do
     social_network = Keyword.get(args, :social_network, VolatileSocialNetwork)
-    clock = Keyword.get(args, :clock, UTCClock)
-    loop(social_network, clock)
+    loop(social_network)
     IO.puts("bye")
   end
 
-  @spec loop(social_network :: Module, clock :: Module) :: nil
-  defp loop(social_network, clock) do
+  @spec loop(social_network :: Module) :: nil
+  defp loop(social_network) do
     text_cmd = IO.gets("") |> String.trim()
-    cmd = parse(text_cmd, clock)
+    request = parse(text_cmd)
 
-    case cmd do
-      {:cmd, cmd} ->
-        social_network.run(cmd)
-        |> to_text
-        |> Enum.each(&IO.puts/1)
+    {social_network_action, next_op} =
+      case request do
+        :not_recognized ->
+          action = fn -> IO.puts("sorry \"#{text_cmd}\" is an unknown command") end
+          {action, :loop}
 
-        loop(social_network, clock)
+        :exit ->
+          action = fn -> :ok end
+          {action, :stop}
 
-      :not_recognized ->
-        IO.puts("sorry \"#{text_cmd}\" is an unknown command")
-        loop(social_network, clock)
+        {:req, %PublishMessageRequest{} = req} ->
+          action = fn ->
+            social_network.publish_message(req)
+            |> to_text
+            |> Enum.each(&IO.puts/1)
+          end
 
-      :exit ->
-        nil
+          {action, :loop}
+
+        {:req, %GetTimelineRequest{} = req} ->
+          action = fn ->
+            social_network.get_timeline(req)
+            |> to_text
+            |> Enum.each(&IO.puts/1)
+          end
+
+          {action, :loop}
+      end
+
+    :ok = social_network_action.()
+
+    if next_op == :loop do
+      loop(social_network)
+    else
+      nil
     end
   end
 
-  @spec parse(text_command :: String.t(), clock :: Module) ::
-          {:cmd, SocialNetwork.commands()} | :exit | :not_recognized
-  defp parse(text_command, clock) do
+  @spec parse(text_command :: String.t()) ::
+          {:req, SocialNetwork.requests()} | :exit | :not_recognized
+  defp parse(text_command) do
     publish_message_data =
       Regex.named_captures(~r/^(?<name>[^\s]+)\s->\s(?<text>.+)$/, text_command)
 
@@ -54,25 +74,21 @@ defmodule SocialNetworkingKata.Cli do
         :exit
 
       publish_message_data != nil ->
-        {:cmd,
-         PublishMessage.new!(
+        {:req,
+         PublishMessageRequest.new!(
            user: User.new!(name: publish_message_data["name"]),
-           message:
-             Message.new!(
-               text: publish_message_data["text"],
-               sent_at: clock.get_current_datetime()
-             )
+           message: MessageToPublish.new!(text: publish_message_data["text"])
          )}
 
       get_timeline_data != nil ->
-        {:cmd, GetTimeline.new!(user: User.new!(name: get_timeline_data["name"]))}
+        {:req, GetTimelineRequest.new!(user: User.new!(name: get_timeline_data["name"]))}
 
       true ->
         :not_recognized
     end
   end
 
-  @spec to_text(SocialNetwork.commands() | Message.t()) :: String.t() | [String.t(), ...]
+  @spec to_text(SocialNetwork.requests() | Message.t()) :: String.t() | [String.t(), ...]
   defp to_text(:ok), do: [""]
 
   defp to_text({:ok, timeline = %Timeline{}}) do
@@ -83,7 +99,9 @@ defmodule SocialNetworkingKata.Cli do
 
   defp to_text(%Message{} = message) do
     minutes_ago =
-      (DateTime.diff(DateTime.now!("Etc/UTC"), message.sent_at) / 60) |> Float.ceil() |> trunc
+      (DateTime.diff(DateTime.now!("Etc/UTC"), message.sent_at, :millisecond) / 60_000)
+      |> Float.ceil()
+      |> trunc
 
     minute_s =
       if minutes_ago == 1 do

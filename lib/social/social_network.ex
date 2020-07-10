@@ -2,12 +2,13 @@ defmodule SocialNetworkingKata.Social.SocialNetwork do
   @moduledoc """
   The behaviour that defines the social network interactions
   """
-  alias SocialNetworkingKata.Social.Messages.PublishMessage
-  alias SocialNetworkingKata.Social.Messages.Timeline
-  alias SocialNetworkingKata.Social.Users.GetTimeline
+  alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
+  alias SocialNetworkingKata.Social.Timeline
+  alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
 
-  @type commands :: PublishMessage.t() | GetTimeline.t()
+  @type requests :: PublishMessageRequest.t() | GetTimelineRequest.t()
 
-  @callback run(cmd :: PublishMessage.t()) :: :ok
-  @callback run(cmd :: GetTimeline.t()) :: {:ok, Timeline.t()}
+  @callback publish_message(request :: PublishMessageRequest.t()) :: :ok
+  @callback publish_message(request :: PublishMessageRequest.t(), opts :: keyword()) :: :ok
+  @callback get_timeline(request :: GetTimelineRequest.t()) :: {:ok, Timeline.t()}
 end

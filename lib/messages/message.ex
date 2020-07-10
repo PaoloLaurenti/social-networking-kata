@@ -1,6 +1,6 @@
 defmodule SocialNetworkingKata.Social.Messages.Message do
   @moduledoc """
-  A struct representing a message.
+  A struct representing a message published by an user
   """
 
   use Domo

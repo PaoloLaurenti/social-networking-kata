@@ -4,8 +4,8 @@ defmodule SocialNetworkingKata.UTCClock do
   """
   @behaviour SocialNetworkingKata.Clock
 
-  @spec get_current_datetime :: DateTime.t()
+  @spec get_current_datetime :: {:ok, DateTime.t()}
   def get_current_datetime do
-    DateTime.now!("Etc/UTC")
+    DateTime.now("Etc/UTC")
   end
 end

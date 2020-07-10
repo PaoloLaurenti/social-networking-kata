@@ -3,12 +3,25 @@ defmodule SocialNetworkingKata.Test.E2e.CliTest do
   use ExUnit.Case
   import ExUnit.CaptureIO
 
+  setup do
+    _ =
+      start_supervised!(%{
+        id: SocialNetworkingKata.Application,
+        start: {SocialNetworkingKata.Application, :start, [nil, nil]}
+      })
+
+    :ok
+  end
+
   test "view user timeline" do
     timeline_output =
-      capture_io("Alice -> I love the weather today\nAlice\nexit", fn ->
-        SocialNetworkingKata.Cli.main()
-      end)
+      capture_io(
+        [input: "Alice -> I love the weather today\nAlice\nexit", capture_prompt: false],
+        fn ->
+          SocialNetworkingKata.Cli.main()
+        end
+      )
 
-    assert timeline_output == "I love the weather today (1 minutes ago)"
+    assert timeline_output == "\nI love the weather today (1 minute ago)\nbye\n"
   end
 end

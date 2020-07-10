@@ -4,11 +4,14 @@ defmodule SocialNetworkingKata.Application do
   @moduledoc false
 
   use Application
+  alias SocialNetworkingKata.Social.SocialNetworkSupervisor
 
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: SocialNetworkingKata.Worker.start_link(arg)
-      # {SocialNetworkingKata.Worker, arg}
+      Supervisor.child_spec({Registry, keys: :unique, name: SocialNetworkingKata.Registry},
+        id: SocialNetworkingKata.Registry
+      ),
+      {SocialNetworkSupervisor, []}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

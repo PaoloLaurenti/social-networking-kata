@@ -1,20 +1,55 @@
 defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
   @moduledoc """
-  The Social Network engine
+  The Social Network implementation that does not persist anything
   """
-  alias SocialNetworkingKata.Social.Messages.PublishMessage
-  alias SocialNetworkingKata.Social.Messages.Timeline
+  alias SocialNetworkingKata.Social.Messages.Message
+  alias SocialNetworkingKata.Social.Publishing.Message, as: MessageToPublish
+  alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
   alias SocialNetworkingKata.Social.SocialNetwork
-  alias SocialNetworkingKata.Social.Users.GetTimeline
+  alias SocialNetworkingKata.Social.SocialNetworkSupervisor
+  alias SocialNetworkingKata.Social.Timeline
+  alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
+  alias SocialNetworkingKata.Social.VolatileMessagesRepository
 
   @behaviour SocialNetwork
 
-  @spec run(cmd :: SocialNetwork.commands()) :: :ok | {:ok, Timeline.t()}
-  def run(%PublishMessage{} = _cmd) do
-    :ok
+  @spec publish_message(request :: PublishMessageRequest.t()) :: :ok
+  def publish_message(%PublishMessageRequest{} = request) do
+    publish_message(request, [])
   end
 
-  def run(%GetTimeline{user: user} = _cmd) do
-    {:ok, %Timeline{user: user, messages: []}}
+  @spec publish_message(PublishMessageRequest.t(), opts :: keyword()) :: :ok
+  def publish_message(
+        %PublishMessageRequest{user: user, message: %MessageToPublish{text: message_text}},
+        opts
+      ) do
+    clock = Keyword.get(opts, :clock, SocialNetworkingKata.UTCClock)
+    {:ok, now} = clock.get_current_datetime()
+    res = SocialNetworkSupervisor.start_user(user)
+
+    case res do
+      {:ok, _} ->
+        message = Message.new!(text: message_text, sent_at: now)
+        VolatileMessagesRepository.add_user_message(user, message)
+
+      {:error, {:already_started, _}} ->
+        message = Message.new!(text: message_text, sent_at: now)
+        VolatileMessagesRepository.add_user_message(user, message)
+    end
+  end
+
+  @spec get_timeline(GetTimelineRequest.t()) :: {:ok, Timeline.t()}
+  def get_timeline(%GetTimelineRequest{user: user}) do
+    res = SocialNetworkSupervisor.start_user(user)
+
+    case res do
+      {:ok, _} ->
+        {:ok, messages} = VolatileMessagesRepository.get_user_messages(user)
+        {:ok, %Timeline{user: user, messages: messages}}
+
+      {:error, {:already_started, _}} ->
+        {:ok, messages} = VolatileMessagesRepository.get_user_messages(user)
+        {:ok, %Timeline{user: user, messages: messages}}
+    end
   end
 end
