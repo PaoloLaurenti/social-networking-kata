@@ -10,16 +10,18 @@ defmodule SocialNetworkingKata.Cli do
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
   alias SocialNetworkingKata.Social.Users.User
   alias SocialNetworkingKata.Social.VolatileSocialNetwork
+  alias SocialNetworkingKata.Time.UTCClock
 
   @spec main(args :: keyword()) :: :ok
   def main(args \\ []) do
     social_network = Keyword.get(args, :social_network, VolatileSocialNetwork)
-    loop(social_network)
+    clock = Keyword.get(args, :clock, UTCClock)
+    loop(social_network, clock)
     IO.puts("bye")
   end
 
-  @spec loop(social_network :: Module) :: nil
-  defp loop(social_network) do
+  @spec loop(social_network :: Module, clock :: Module) :: nil
+  defp loop(social_network, clock) do
     text_cmd = IO.gets("") |> String.trim()
     request = parse(text_cmd)
 
@@ -45,7 +47,7 @@ defmodule SocialNetworkingKata.Cli do
         {:req, %GetTimelineRequest{} = req} ->
           action = fn ->
             social_network.get_timeline(req)
-            |> to_text
+            |> to_text(clock)
             |> Enum.each(&IO.puts/1)
           end
 
@@ -55,7 +57,7 @@ defmodule SocialNetworkingKata.Cli do
     :ok = social_network_action.()
 
     if next_op == :loop do
-      loop(social_network)
+      loop(social_network, clock)
     else
       nil
     end
@@ -88,28 +90,58 @@ defmodule SocialNetworkingKata.Cli do
     end
   end
 
-  @spec to_text(SocialNetwork.requests() | Message.t()) :: String.t() | [String.t(), ...]
   defp to_text(:ok), do: [""]
 
-  defp to_text({:ok, timeline = %Timeline{}}) do
+  defp to_text({:ok, timeline = %Timeline{}}, clock) do
     timeline.messages
-    |> Enum.sort_by(fn m -> m.sent_at end, :desc)
-    |> Enum.map(&to_text/1)
+    |> Enum.sort_by(
+      fn m ->
+        {m.sent_at.year, m.sent_at.month, m.sent_at.day, m.sent_at.hour, m.sent_at.minute,
+         m.sent_at.second}
+      end,
+      :desc
+    )
+    |> Enum.map(fn m -> to_text(m, clock) end)
   end
 
-  defp to_text(%Message{} = message) do
-    minutes_ago =
-      (DateTime.diff(DateTime.now!("Etc/UTC"), message.sent_at, :millisecond) / 60_000)
+  defp to_text(%Message{} = message, clock) do
+    {:ok, now} = clock.get_current_datetime()
+
+    seconds_ago =
+      (DateTime.diff(now, message.sent_at, :millisecond) / 1000)
       |> Float.ceil()
       |> trunc
 
-    minute_s =
-      if minutes_ago == 1 do
-        "minute"
-      else
-        "minutes"
+    {time_ago, unit} =
+      cond do
+        seconds_ago == 86_400 ->
+          {1, "day"}
+
+        seconds_ago > 86_400 ->
+          days_ago = (seconds_ago / 86_400) |> Float.ceil() |> trunc
+          {days_ago, "days"}
+
+        seconds_ago == 3600 ->
+          {1, "hour"}
+
+        seconds_ago > 3600 ->
+          hours_ago = (seconds_ago / 3600) |> Float.ceil() |> trunc
+          {hours_ago, "hours"}
+
+        seconds_ago == 60 ->
+          {1, "minute"}
+
+        seconds_ago > 60 ->
+          minutes_ago = (seconds_ago / 60) |> Float.ceil() |> trunc
+          {minutes_ago, "minutes"}
+
+        seconds_ago == 1 ->
+          {seconds_ago, "second"}
+
+        true ->
+          {seconds_ago, "seconds"}
       end
 
-    "#{message.text} (#{minutes_ago} #{minute_s} ago)"
+    "#{message.text} (#{time_ago} #{unit} ago)"
   end
 end
