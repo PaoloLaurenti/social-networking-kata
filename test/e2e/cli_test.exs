@@ -22,7 +22,6 @@ defmodule SocialNetworkingKata.Test.E2e.CliTest do
         end
       )
 
-
     assert timeline_output =~ ~r/^\nI love the weather today \(\d+ seconds? ago\)\nbye\n$/
   end
 end

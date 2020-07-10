@@ -51,6 +51,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
     less_than_one_minute_ago = DateTime.add(now, -45, :second)
 
     stub(ClockMock, :get_current_datetime, fn -> {:ok, now} end)
+
     stub(SocialNetworkServerMock, :get_timeline, fn req ->
       send(self(), req)
 
