@@ -94,7 +94,7 @@ defmodule SocialNetworkingKata.Cli do
 
   defp to_text({:ok, timeline = %Timeline{}}, clock) do
     timeline.messages
-    |> Enum.sort_by(&(&1.sent_at), {:desc, DateTime})
+    |> Enum.sort_by(& &1.sent_at, {:desc, DateTime})
     |> Enum.map(fn m -> to_text(m, clock) end)
   end
 
