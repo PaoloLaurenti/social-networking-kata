@@ -12,6 +12,8 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
   alias SocialNetworkingKata.Social.Users.User
 
+  setup :set_mox_from_context
+
   test "CLI stops after exit command" do
     output =
       capture_io([input: "exit", capture_prompt: false], fn ->
@@ -46,6 +48,8 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
   end
 
   test "CLI gets user timeline from social network" do
+    parent = self()
+    ref = make_ref()
     now = DateTime.now!("Etc/UTC")
     four_minutes_and_something_ago = DateTime.add(now, -250, :second)
     less_than_one_minute_ago = DateTime.add(now, -45, :second)
@@ -53,7 +57,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
     stub(ClockMock, :get_current_datetime, fn -> {:ok, now} end)
 
     stub(SocialNetworkServerMock, :get_timeline, fn req ->
-      send(self(), req)
+      send(parent, {ref, req})
 
       {:ok,
        Timeline.new!(
@@ -74,7 +78,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
       )
 
     expected_timeline_command = GetTimelineRequest.new!(user: User.new!(name: "Alice"))
-    assert_receive ^expected_timeline_command
+    assert_receive {^ref, ^expected_timeline_command}
 
     assert output ==
              "Some recent message (45 seconds ago)\nSome older message (5 minutes ago)\nbye\n"

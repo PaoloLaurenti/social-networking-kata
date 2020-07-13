@@ -1,4 +1,2 @@
-Application.ensure_all_started(:mox)
-Mox.defmock(SocialNetworkServerMock, for: SocialNetworkingKata.Social.SocialNetwork)
-Mox.defmock(ClockMock, for: SocialNetworkingKata.Time.Clock)
-ExUnit.start()
+:ok = ExUnit.start()
+{:ok, _} = Application.ensure_all_started(:mox)

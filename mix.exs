@@ -11,6 +11,7 @@ defmodule SocialNetworkingKata.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
+      elixirc_paths: elixirc_paths(Mix.env()),
       dialyzer: [
         plt_file: {:no_warn, "_build/dialyzer.plt"},
         plt_add_deps: :app_tree,
@@ -39,6 +40,9 @@ defmodule SocialNetworkingKata.MixProject do
       {:domo, "~> 1.0"}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["test/support", "lib"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp escript do
     [main_module: SocialNetwork.Cli]

@@ -12,6 +12,8 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
   alias SocialNetworkingKata.Social.Users.User
   alias SocialNetworkingKata.Social.VolatileSocialNetwork
 
+  setup :set_mox_from_context
+
   setup do
     _ =
       start_supervised!(%{
