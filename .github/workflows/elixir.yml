@@ -23,9 +23,21 @@ jobs:
       uses: actions/cache@v2
       with:
         path: deps
-        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-        restore-keys: ${{ runner.os }}-mix-
+        key: deps-${{ hashFiles('**/mix.lock') }}
+        restore-keys: deps
+    - name: Restore plt file
+      uses: actions/cache@v2
+      with:
+        path: _build
+        key: build-${{ hashFiles('**/mix.lock') }}
+        restore-keys: build
     - name: Install dependencies
       run: mix deps.get
+    - name: Check code format
+      run: mix format --check-formatted
+    - name: Run credo linting check
+      run: mix credo --strict
+    - name: Run dyalizer
+      run: mix dialyzer
     - name: Run tests
       run: mix test
