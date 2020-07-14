@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/PaoloLaurenti/social-networking-kata/workflows/Elixir%20CI/badge.svg)](https://github.com/PaoloLaurenti/social-networking-kata/actions)
+[![Actions Status](https://github.com/PaoloLaurenti/social-networking-kata/workflows/CI/badge.svg)](https://github.com/PaoloLaurenti/social-networking-kata/actions)
 
 # Social Networking Kata
 
