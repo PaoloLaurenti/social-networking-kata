@@ -50,7 +50,8 @@ defmodule SocialNetworkingKata.MixProject do
 
   defp aliases do
     [
-      test: "test --no-start --trace"
+      test: "test --no-start --trace",
+      code_quality: ["format --check-formatted", "credo --strict", "dialyzer"]
     ]
   end
 end

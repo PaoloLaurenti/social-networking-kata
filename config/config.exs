@@ -9,9 +9,7 @@ if Mix.env() != :prod do
     hooks: [
       pre_commit: [
         tasks: [
-          "mix format",
-          "mix credo --strict",
-          "mix dialyzer",
+          "mix code_quality",
           "echo 'success!'"
         ]
       ]

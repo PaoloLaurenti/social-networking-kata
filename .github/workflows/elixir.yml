@@ -33,11 +33,7 @@ jobs:
         restore-keys: build
     - name: Install dependencies
       run: mix deps.get
-    - name: Check code format
-      run: mix format --check-formatted
-    - name: Run credo linting check
-      run: mix credo --strict
-    - name: Run dyalizer
-      run: mix dialyzer
+    - name: Check code quality
+      run: mix code_quality
     - name: Run tests
       run: mix test
