@@ -7,7 +7,16 @@ defmodule SocialNetworkingKata.Social.SocialNetworkSupervisor do
   alias SocialNetworkingKata.Social.Users.User
   alias SocialNetworkingKata.Social.Users.UsersSupervisor
 
-  @spec start_link(args :: []) :: Supervisor.on_start()
+  @spec child_spec(args :: any()) :: Supervisor.child_spec()
+  def child_spec(args) do
+    %{
+      id: SocialNetworkSupervisor,
+      start: {__MODULE__, :start_link, [args]},
+      type: :supervisor
+    }
+  end
+
+  @spec start_link(args :: any()) :: Supervisor.on_start()
   def start_link(args) do
     DynamicSupervisor.start_link(__MODULE__, args, name: __MODULE__)
   end
@@ -20,7 +29,6 @@ defmodule SocialNetworkingKata.Social.SocialNetworkSupervisor do
 
   @spec start_user(user :: User.t()) :: DynamicSupervisor.on_start_child()
   def start_user(user) do
-    spec = {UsersSupervisor, [user: user]}
-    DynamicSupervisor.start_child(__MODULE__, spec)
+    DynamicSupervisor.start_child(__MODULE__, {UsersSupervisor, user: user})
   end
 end

@@ -7,11 +7,20 @@ defmodule SocialNetworkingKata.Social.Users.UsersSupervisor do
   alias SocialNetworkingKata.Social.Messages.VolatileMessagesRepository
   alias SocialNetworkingKata.Social.Users.User
 
-  @spec start_link(keyword()) ::
+  @spec child_spec(user: %User{}) :: Supervisor.child_spec()
+  def child_spec(user: %User{} = user) do
+    %{
+      id: ServicesNamesResolver.get_name(__MODULE__, user.name),
+      start: {__MODULE__, :start_link, [[user: user]]},
+      type: :supervisor
+    }
+  end
+
+  @spec start_link(user: %User{}) ::
           {:ok, pid()} | {:error, {:already_started, pid()} | {:shutdown, term()} | term()}
-  def start_link(user: %User{name: name} = user) do
+  def start_link(user: user) do
     Supervisor.start_link(__MODULE__, [user: user],
-      name: ServicesNamesResolver.get_name(__MODULE__, name)
+      name: ServicesNamesResolver.get_name(__MODULE__, user.name)
     )
   end
 
