@@ -106,36 +106,52 @@ defmodule SocialNetworkingKata.Cli do
       |> Float.ceil()
       |> trunc
 
-    {time_ago, unit} =
-      cond do
-        seconds_ago == 86_400 ->
-          {1, "day"}
+    secs_to_text =
+      secs_to_text_config()
+      |> Enum.find(fn secs_to_text -> secs_to_text.predicate.(seconds_ago) end)
 
-        seconds_ago > 86_400 ->
-          days_ago = (seconds_ago / 86_400) |> Float.ceil() |> trunc
-          {days_ago, "days"}
-
-        seconds_ago == 3600 ->
-          {1, "hour"}
-
-        seconds_ago > 3600 ->
-          hours_ago = (seconds_ago / 3600) |> Float.ceil() |> trunc
-          {hours_ago, "hours"}
-
-        seconds_ago == 60 ->
-          {1, "minute"}
-
-        seconds_ago > 60 ->
-          minutes_ago = (seconds_ago / 60) |> Float.ceil() |> trunc
-          {minutes_ago, "minutes"}
-
-        seconds_ago == 1 ->
-          {seconds_ago, "second"}
-
-        true ->
-          {seconds_ago, "seconds"}
-      end
-
+    {time_ago, unit} = secs_to_text.apply.(seconds_ago)
     "#{message.text} (#{time_ago} #{unit} ago)"
+  end
+
+  defp secs_to_text_config do
+    [
+      %{
+        predicate: fn secs_ago -> secs_ago == 86_400 end,
+        apply: fn _secs_ago -> {1, "day"} end
+      },
+      %{
+        predicate: fn secs_ago -> secs_ago > 86_400 end,
+        apply: fn secs_ago -> {to_time_ago(secs_ago, 86_400), "days"} end
+      },
+      %{
+        predicate: fn secs_ago -> secs_ago == 3600 end,
+        apply: fn _secs_ago -> {1, "hour"} end
+      },
+      %{
+        predicate: fn secs_ago -> secs_ago > 3600 end,
+        apply: fn secs_ago -> {to_time_ago(secs_ago, 3600), "hours"} end
+      },
+      %{
+        predicate: fn secs_ago -> secs_ago == 60 end,
+        apply: fn _secs_ago -> {1, "minute"} end
+      },
+      %{
+        predicate: fn secs_ago -> secs_ago > 60 end,
+        apply: fn secs_ago -> {to_time_ago(secs_ago, 60), "minutes"} end
+      },
+      %{
+        predicate: fn secs_ago -> secs_ago == 1 end,
+        apply: fn _secs_ago -> {1, "second"} end
+      },
+      %{
+        predicate: fn _secs_ago -> true end,
+        apply: fn secs_ago -> {secs_ago, "seconds"} end
+      }
+    ]
+  end
+
+  defp to_time_ago(secs_ago, threshold_secs) do
+    (secs_ago / threshold_secs) |> Float.ceil() |> trunc
   end
 end
