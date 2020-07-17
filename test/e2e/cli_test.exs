@@ -14,7 +14,7 @@ defmodule SocialNetworkingKata.Test.E2e.CliTest do
   end
 
   test "view user timeline" do
-    timeline_output =
+    output =
       capture_io(
         [input: "Alice -> I love the weather today\nAlice\nexit", capture_prompt: false],
         fn ->
@@ -22,6 +22,31 @@ defmodule SocialNetworkingKata.Test.E2e.CliTest do
         end
       )
 
-    assert timeline_output =~ ~r/^\nI love the weather today \(\d+ seconds? ago\)\nbye\n$/
+    assert output =~ ~r/^\nI love the weather today \(\d+ seconds? ago\)\nbye\n$/
+  end
+
+  test "view user wall" do
+    alice_message = "Alice -> I love the weather today"
+    charlie_message = "Charlie -> I'm in New York today!"
+
+    input = [
+      alice_message,
+      charlie_message,
+      "Bob -> Damn! We lost!",
+      "Charlie follows Alice",
+      "Charlie wall",
+      "exit"
+    ]
+
+    output =
+      capture_io(
+        [input: Enum.join(input, "\n"), capture_prompt: false],
+        fn ->
+          SocialNetworkingKata.Cli.main()
+        end
+      )
+
+    assert output =~
+             ~r/^\n#{charlie_message} \(\d+ seconds? ago\)\n#{alice_message} \(\d+ seconds? ago\)\nbye\n$/
   end
 end

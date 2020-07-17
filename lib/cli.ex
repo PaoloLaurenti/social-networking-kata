@@ -2,6 +2,7 @@ defmodule SocialNetworkingKata.Cli do
   @moduledoc """
   The Cli of the Social Network
   """
+  alias SocialNetworkingKata.Social.Following.FollowUserRequest
   alias SocialNetworkingKata.Social.Messages.Message
   alias SocialNetworkingKata.Social.Publishing.Message, as: MessageToPublish
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
@@ -52,6 +53,15 @@ defmodule SocialNetworkingKata.Cli do
           end
 
           {action, :loop}
+
+        {:req, %FollowUserRequest{} = req} ->
+          action = fn ->
+            social_network.follow_user(req)
+            |> to_text
+            |> Enum.each(&IO.puts/1)
+          end
+
+          {action, :loop}
       end
 
     :ok = social_network_action.()
@@ -71,6 +81,9 @@ defmodule SocialNetworkingKata.Cli do
 
     get_timeline_data = Regex.named_captures(~r/^(?<name>[^\s]+)$/, text_command)
 
+    follow_user_data =
+      Regex.named_captures(~r/^(?<follower>.+)\sfollows\s(?<followee>.+)$/, text_command)
+
     cond do
       text_command == "exit" ->
         :exit
@@ -84,6 +97,13 @@ defmodule SocialNetworkingKata.Cli do
 
       get_timeline_data != nil ->
         {:req, GetTimelineRequest.new!(user: User.new!(name: get_timeline_data["name"]))}
+
+      follow_user_data != nil ->
+        {:req,
+         FollowUserRequest.new!(
+           followee: User.new!(name: follow_user_data["followee"]),
+           follower: User.new!(name: follow_user_data["follower"])
+         )}
 
       true ->
         :not_recognized

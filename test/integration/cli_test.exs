@@ -5,6 +5,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
   import ExUnit.CaptureIO
   import Mox
 
+  alias SocialNetworkingKata.Social.Following.FollowUserRequest
   alias SocialNetworkingKata.Social.Messages.Message
   alias SocialNetworkingKata.Social.Publishing.Message, as: MessageToPublish
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
@@ -84,7 +85,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
              "Some recent message (45 seconds ago)\nSome older message (5 minutes ago)\nbye\n"
   end
 
-  test "CLI report timestamps of user timeline messages sent less than one minute ago, using seconds unit" do
+  test "CLI reports timestamps of user timeline messages sent less than one minute ago, using seconds unit" do
     now = DateTime.now!("Etc/UTC")
     less_than_one_minute_ago = DateTime.add(now, -45, :second)
     one_second_ago = DateTime.add(now, -1, :second)
@@ -99,7 +100,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
     )
   end
 
-  test "CLI report timestamps user timeline messages sent less than one day ago, using hours unit" do
+  test "CLI reports timestamps user timeline messages sent less than one day ago, using hours unit" do
     now = DateTime.now!("Etc/UTC")
     eleven_hours_ago = DateTime.add(now, -39_600, :second)
     one_hour_ago = DateTime.add(now, -3600, :second)
@@ -114,7 +115,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
     )
   end
 
-  test "CLI report timestamps user timeline messages sent less than more than or equal to one day ago, using days unit" do
+  test "CLI reports timestamps user timeline messages sent less than more than or equal to one day ago, using days unit" do
     now = DateTime.now!("Etc/UTC")
     eleven_days_ago = DateTime.add(now, -950_400, :second)
     one_day_ago = DateTime.add(now, -86_400, :second)
@@ -127,6 +128,30 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
       "Some recent message (1 day ago)\nSome older message (11 days ago)\nbye\n",
       now
     )
+  end
+
+  test "CLI sends follow command to the social network" do
+    test_pid = self()
+
+    stub(SocialNetworkServerMock, :follow_user, fn req ->
+      send(test_pid, req)
+      :ok
+    end)
+
+    capture_io(
+      [input: "Charlie follows Alice\nexit", capture_prompt: false],
+      fn ->
+        SocialNetworkingKata.Cli.main(social_network: SocialNetworkServerMock)
+      end
+    )
+
+    expected_follow_request =
+      FollowUserRequest.new!(
+        followee: User.new!(name: "Alice"),
+        follower: User.new!(name: "Charlie")
+      )
+
+    assert_receive ^expected_follow_request
   end
 
   def test_timeline_messages_time_unit(timeline_messages, expected_output, now) do

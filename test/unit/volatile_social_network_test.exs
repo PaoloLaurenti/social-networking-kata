@@ -4,6 +4,7 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
 
   import Mox
 
+  alias SocialNetworkingKata.Social.Following.FollowUserRequest
   alias SocialNetworkingKata.Social.Messages.Message
   alias SocialNetworkingKata.Social.Publishing.Message, as: MessageToPublish
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
@@ -78,5 +79,16 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
        )}
 
     assert result === expected_result
+  end
+
+  test "follow user returns successfull result" do
+    followee_user = User.new!(name: "Alice")
+    follower_user = User.new!(name: "Charlie")
+
+    result =
+      FollowUserRequest.new!(followee: followee_user, follower: follower_user)
+      |> VolatileSocialNetwork.follow_user()
+
+    assert result === :ok
   end
 end

@@ -2,6 +2,7 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
   @moduledoc """
   The Social Network implementation that does not persist anything
   """
+  alias SocialNetworkingKata.Social.Following.FollowUserRequest
   alias SocialNetworkingKata.Social.Messages.Message
   alias SocialNetworkingKata.Social.Messages.VolatileMessagesRepository
   alias SocialNetworkingKata.Social.Publishing.Message, as: MessageToPublish
@@ -51,5 +52,10 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
         {:ok, messages} = VolatileMessagesRepository.get_user_messages(user)
         {:ok, %Timeline{user: user, messages: messages}}
     end
+  end
+
+  @spec follow_user(request :: FollowUserRequest.t()) :: :ok
+  def follow_user(_request) do
+    :ok
   end
 end
