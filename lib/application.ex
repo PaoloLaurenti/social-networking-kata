@@ -5,13 +5,15 @@ defmodule SocialNetworkingKata.Application do
 
   use Application
   alias SocialNetworkingKata.Social.SocialNetworkSupervisor
+  alias SocialNetworkingKata.Social.Users.VolatileUsersRepository
 
   def start(_type, _args) do
     children = [
       Supervisor.child_spec({Registry, keys: :unique, name: SocialNetworkingKata.Registry},
         id: SocialNetworkingKata.Registry
       ),
-      {SocialNetworkSupervisor, []}
+      {SocialNetworkSupervisor, []},
+      VolatileUsersRepository
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -9,6 +9,7 @@ if Mix.env() != :prod do
     hooks: [
       pre_commit: [
         tasks: [
+          "mix compile --warnings-as-errors",
           "mix code_quality",
           "echo 'success!'"
         ]

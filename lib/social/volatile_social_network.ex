@@ -11,6 +11,12 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
   alias SocialNetworkingKata.Social.SocialNetworkSupervisor
   alias SocialNetworkingKata.Social.Timeline
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
+  alias SocialNetworkingKata.Social.Users.VolatileUsersRepository
+  alias SocialNetworkingKata.Social.Wall
+  alias SocialNetworkingKata.Social.Wall.Entry
+  alias SocialNetworkingKata.Social.Wall.EntryUser
+  alias SocialNetworkingKata.Social.Wall.GetWallRequest
+  alias SocialNetworkingKata.Social.Wall.User, as: WallUser
 
   @behaviour SocialNetwork
 
@@ -45,17 +51,52 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
 
     case res do
       {:ok, _} ->
-        {:ok, messages} = VolatileMessagesRepository.get_user_messages(user)
+        {:ok, messages} = VolatileMessagesRepository.get_user_messages(user.name)
         {:ok, %Timeline{user: user, messages: messages}}
 
       {:error, {:already_started, _}} ->
-        {:ok, messages} = VolatileMessagesRepository.get_user_messages(user)
+        {:ok, messages} = VolatileMessagesRepository.get_user_messages(user.name)
         {:ok, %Timeline{user: user, messages: messages}}
     end
   end
 
   @spec follow_user(request :: FollowUserRequest.t()) :: :ok
-  def follow_user(_request) do
-    :ok
+  def follow_user(%FollowUserRequest{followee: followee, follower: follower}) do
+    VolatileUsersRepository.upsert_user_followings(
+      followeeUsername: followee.name,
+      followerUsername: follower.name
+    )
+  end
+
+  @spec get_wall(request :: GetWallRequest.t()) :: {:ok, Wall.t()}
+  def get_wall(%GetWallRequest{username: username}) do
+    {:ok, user} = VolatileUsersRepository.get_user(username)
+
+    followed_users_entries =
+      user.followed_usernames
+      |> Enum.flat_map(fn followed_username ->
+        {:ok, messages} = VolatileMessagesRepository.get_user_messages(followed_username)
+
+        Enum.map(messages, fn m ->
+          entry_user = EntryUser.new!(name: followed_username)
+          Entry.new!(user: entry_user, message: m)
+        end)
+      end)
+
+    {:ok, messages} = VolatileMessagesRepository.get_user_messages(username)
+
+    user_entries =
+      Enum.map(messages, fn m ->
+        entry_user = EntryUser.new!(name: username)
+        Entry.new!(user: entry_user, message: m)
+      end)
+
+    entries =
+      user_entries
+      |> Enum.concat(followed_users_entries)
+      |> Enum.sort_by(& &1.message.sent_at, {:asc, DateTime})
+
+    wall_user = WallUser.new!(name: username)
+    {:ok, Wall.new!(user: wall_user, entries: entries)}
   end
 end

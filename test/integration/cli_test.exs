@@ -12,6 +12,11 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
   alias SocialNetworkingKata.Social.Timeline
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
   alias SocialNetworkingKata.Social.Users.User
+  alias SocialNetworkingKata.Social.Wall
+  alias SocialNetworkingKata.Social.Wall.Entry
+  alias SocialNetworkingKata.Social.Wall.EntryUser
+  alias SocialNetworkingKata.Social.Wall.GetWallRequest
+  alias SocialNetworkingKata.Social.Wall.User, as: WallUser
 
   setup :set_mox_from_context
 
@@ -152,6 +157,56 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
       )
 
     assert_receive ^expected_follow_request
+  end
+
+  test "CLI gets user wall from social network" do
+    parent = self()
+    ref = make_ref()
+    now = DateTime.now!("Etc/UTC")
+    four_minutes_and_something_ago = DateTime.add(now, -250, :second)
+    less_than_one_minute_ago = DateTime.add(now, -45, :second)
+
+    stub(ClockMock, :get_current_datetime, fn -> {:ok, now} end)
+
+    stub(SocialNetworkServerMock, :get_wall, fn req ->
+      send(parent, {ref, req})
+
+      charlie_wall =
+        Wall.new!(
+          user: WallUser.new!(name: "Charlie"),
+          entries: [
+            Entry.new!(
+              user: EntryUser.new!(name: "Charlie"),
+              message:
+                Message.new!(text: "I'm in New York today!", sent_at: less_than_one_minute_ago)
+            ),
+            Entry.new!(
+              user: EntryUser.new!(name: "Alice"),
+              message:
+                Message.new!(
+                  text: "I love the weather today",
+                  sent_at: four_minutes_and_something_ago
+                )
+            )
+          ]
+        )
+
+      {:ok, charlie_wall}
+    end)
+
+    output =
+      capture_io(
+        [input: "Charlie wall\nexit", capture_prompt: false],
+        fn ->
+          SocialNetworkingKata.Cli.main(social_network: SocialNetworkServerMock, clock: ClockMock)
+        end
+      )
+
+    expected_timeline_command = GetWallRequest.new!(username: "Charlie")
+    assert_receive {^ref, ^expected_timeline_command}
+
+    assert output ==
+             "Charlie - I'm in New York today! (45 seconds ago)\nAlice - I love the weather today (5 minutes ago)\nbye\n"
   end
 
   def test_timeline_messages_time_unit(timeline_messages, expected_output, now) do

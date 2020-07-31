@@ -12,6 +12,11 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
   alias SocialNetworkingKata.Social.Users.User
   alias SocialNetworkingKata.Social.VolatileSocialNetwork
+  alias SocialNetworkingKata.Social.Wall
+  alias SocialNetworkingKata.Social.Wall.Entry
+  alias SocialNetworkingKata.Social.Wall.EntryUser
+  alias SocialNetworkingKata.Social.Wall.GetWallRequest
+  alias SocialNetworkingKata.Social.Wall.User, as: WallUser
 
   setup :set_mox_from_context
 
@@ -43,7 +48,7 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
     assert result === expected_result
   end
 
-  test "get timeline returns the messages published by an user before" do
+  test "get timeline returns the messages published before by an user" do
     now = DateTime.now!("Etc/UTC")
     four_minutes_and_something_ago = DateTime.add(now, -250, :second)
     less_than_one_minute_ago = DateTime.add(now, -45, :second)
@@ -81,7 +86,7 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
     assert result === expected_result
   end
 
-  test "follow user returns successfull result" do
+  test "follow user returns a successfull result" do
     followee_user = User.new!(name: "Alice")
     follower_user = User.new!(name: "Charlie")
 
@@ -90,5 +95,67 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
       |> VolatileSocialNetwork.follow_user()
 
     assert result === :ok
+  end
+
+  @tag :skip
+  test "follow user of an already follwed user returns a successfull result" do
+  end
+
+  test "get wall returns the user own messages and the messages published before by the followed users" do
+    now = DateTime.now!("Etc/UTC")
+    four_minutes_and_something_ago = DateTime.add(now, -250, :second)
+    less_than_one_minute_ago = DateTime.add(now, -45, :second)
+    charlie = User.new!(name: "Charlie")
+    alice = User.new!(name: "Alice")
+
+    stub(ClockMock, :get_current_datetime, fn -> {:ok, four_minutes_and_something_ago} end)
+
+    :ok =
+      PublishMessageRequest.new!(
+        user: alice,
+        message: MessageToPublish.new!(text: "I love the weather today")
+      )
+      |> VolatileSocialNetwork.publish_message(clock: ClockMock)
+
+    stub(ClockMock, :get_current_datetime, fn -> {:ok, less_than_one_minute_ago} end)
+
+    :ok =
+      PublishMessageRequest.new!(
+        user: charlie,
+        message: MessageToPublish.new!(text: "I'm in New York today!")
+      )
+      |> VolatileSocialNetwork.publish_message(clock: ClockMock)
+
+    FollowUserRequest.new!(followee: alice, follower: charlie)
+    |> VolatileSocialNetwork.follow_user()
+
+    {:ok, charlie_wall_result} =
+      GetWallRequest.new!(username: "Charlie") |> VolatileSocialNetwork.get_wall()
+
+    expected_charlie_wall_result =
+      Wall.new!(
+        user: WallUser.new!(name: "Charlie"),
+        entries: [
+          Entry.new!(
+            user: EntryUser.new!(name: "Alice"),
+            message:
+              Message.new!(
+                text: "I love the weather today",
+                sent_at: four_minutes_and_something_ago
+              )
+          ),
+          Entry.new!(
+            user: EntryUser.new!(name: "Charlie"),
+            message:
+              Message.new!(text: "I'm in New York today!", sent_at: less_than_one_minute_ago)
+          )
+        ]
+      )
+
+    assert charlie_wall_result === expected_charlie_wall_result
+  end
+
+  @tag :skip
+  test "get wall of an unknown user returns an empty wall" do
   end
 end

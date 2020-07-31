@@ -20,7 +20,7 @@ defmodule SocialNetworkingKata.Social.Messages.VolatileMessagesRepository do
   @typep requests :: {:add_user_message, Message.t()} | :get_messages
   @typep responses :: {:reply, :ok, State.t()} | {:reply, {:ok, [Message.t()]}, State.t()}
 
-  @spec start_link(keyword()) ::
+  @spec start_link(user: User.t()) ::
           :ignore | {:error, any} | {:ok, pid}
   def start_link(user: %User{name: name}) do
     GenServer.start_link(__MODULE__, [], name: server_name(name))
@@ -31,9 +31,9 @@ defmodule SocialNetworkingKata.Social.Messages.VolatileMessagesRepository do
     GenServer.call(server_name(name), {:add_user_message, message})
   end
 
-  @spec get_user_messages(user :: User.t()) :: {:ok, [Message.t()]}
-  def get_user_messages(%User{name: name}) do
-    GenServer.call(server_name(name), :get_messages)
+  @spec get_user_messages(username :: String.t()) :: {:ok, [Message.t()]}
+  def get_user_messages(username) do
+    GenServer.call(server_name(username), :get_messages)
   end
 
   @impl true

@@ -35,5 +35,7 @@ jobs:
       run: mix deps.get
     - name: Check code quality
       run: mix code_quality
+    - name: Compile
+      run: MIX_ENV=test mix compile --warnings-as-errors
     - name: Run tests
       run: mix test

@@ -11,6 +11,9 @@ defmodule SocialNetworkingKata.Cli do
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
   alias SocialNetworkingKata.Social.Users.User
   alias SocialNetworkingKata.Social.VolatileSocialNetwork
+  alias SocialNetworkingKata.Social.Wall
+  alias SocialNetworkingKata.Social.Wall.Entry
+  alias SocialNetworkingKata.Social.Wall.GetWallRequest
   alias SocialNetworkingKata.Time.UTCClock
 
   @spec main(args :: keyword()) :: :ok
@@ -62,6 +65,15 @@ defmodule SocialNetworkingKata.Cli do
           end
 
           {action, :loop}
+
+        {:req, %GetWallRequest{} = req} ->
+          action = fn ->
+            social_network.get_wall(req)
+            |> to_text(clock)
+            |> Enum.each(&IO.puts/1)
+          end
+
+          {action, :loop}
       end
 
     :ok = social_network_action.()
@@ -84,6 +96,8 @@ defmodule SocialNetworkingKata.Cli do
     follow_user_data =
       Regex.named_captures(~r/^(?<follower>.+)\sfollows\s(?<followee>.+)$/, text_command)
 
+    get_wall_data = Regex.named_captures(~r/^(?<name>[^\s]+)\swall$/, text_command)
+
     cond do
       text_command == "exit" ->
         :exit
@@ -104,6 +118,9 @@ defmodule SocialNetworkingKata.Cli do
            followee: User.new!(name: follow_user_data["followee"]),
            follower: User.new!(name: follow_user_data["follower"])
          )}
+
+      get_wall_data != nil ->
+        {:req, GetWallRequest.new!(username: get_wall_data["name"])}
 
       true ->
         :not_recognized
@@ -132,6 +149,28 @@ defmodule SocialNetworkingKata.Cli do
 
     {time_ago, unit} = secs_to_text.apply.(seconds_ago)
     "#{message.text} (#{time_ago} #{unit} ago)"
+  end
+
+  defp to_text({:ok, %Wall{} = wall}, clock) do
+    wall.entries
+    |> Enum.sort_by(& &1.message.sent_at, {:desc, DateTime})
+    |> Enum.map(fn m -> to_text(m, clock) end)
+  end
+
+  defp to_text(%Entry{user: user, message: message}, clock) do
+    {:ok, now} = clock.get_current_datetime()
+
+    seconds_ago =
+      (DateTime.diff(now, message.sent_at, :millisecond) / 1000)
+      |> Float.ceil()
+      |> trunc
+
+    secs_to_text =
+      secs_to_text_config()
+      |> Enum.find(fn secs_to_text -> secs_to_text.predicate.(seconds_ago) end)
+
+    {time_ago, unit} = secs_to_text.apply.(seconds_ago)
+    "#{user.name} - #{message.text} (#{time_ago} #{unit} ago)"
   end
 
   defp secs_to_text_config do

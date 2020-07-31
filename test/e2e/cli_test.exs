@@ -46,7 +46,10 @@ defmodule SocialNetworkingKata.Test.E2e.CliTest do
         end
       )
 
-    assert output =~
-             ~r/^\n#{charlie_message} \(\d+ seconds? ago\)\n#{alice_message} \(\d+ seconds? ago\)\nbye\n$/
+    pattern =
+      "^\\n+Charlie - I\\'m in New York today! \\(\\d+ seconds? ago\\)\\nAlice - I love the weather today \\(\\d+ seconds? ago\\)\\nbye\\n$"
+      |> Regex.compile!()
+
+    assert output =~ pattern
   end
 end
