@@ -4,10 +4,9 @@ defmodule SocialNetworkingKata.Social.Timeline.GetTimelineRequest do
   """
 
   use Domo
-  alias SocialNetworkingKata.Social.Users.User
 
   @typedoc "A retrieve timeline request"
   typedstruct do
-    field :user, User.t()
+    field :username, String.t()
   end
 end

@@ -4,7 +4,6 @@ defmodule SocialNetworkingKata.Social.SocialNetworkSupervisor do
   supervisor
   """
   use DynamicSupervisor
-  alias SocialNetworkingKata.Social.Users.User
   alias SocialNetworkingKata.Social.Users.UsersSupervisor
 
   @spec child_spec(args :: any()) :: Supervisor.child_spec()
@@ -27,8 +26,8 @@ defmodule SocialNetworkingKata.Social.SocialNetworkSupervisor do
     DynamicSupervisor.init(strategy: :one_for_one, extra_arguments: args)
   end
 
-  @spec start_user(user :: User.t()) :: DynamicSupervisor.on_start_child()
-  def start_user(user) do
-    DynamicSupervisor.start_child(__MODULE__, {UsersSupervisor, user: user})
+  @spec start_user(username :: String.t()) :: DynamicSupervisor.on_start_child()
+  def start_user(username) do
+    DynamicSupervisor.start_child(__MODULE__, {UsersSupervisor, username: username})
   end
 end

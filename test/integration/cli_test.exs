@@ -46,7 +46,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
 
     expected_publish_request =
       PublishMessageRequest.new!(
-        user: User.new!(name: "Alice"),
+        username: "Alice",
         message: MessageToPublish.new!(text: "I love the weather today")
       )
 
@@ -83,7 +83,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
         end
       )
 
-    expected_timeline_command = GetTimelineRequest.new!(user: User.new!(name: "Alice"))
+    expected_timeline_command = GetTimelineRequest.new!(username: "Alice")
     assert_receive {^ref, ^expected_timeline_command}
 
     assert output ==
@@ -150,12 +150,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
       end
     )
 
-    expected_follow_request =
-      FollowUserRequest.new!(
-        followee: User.new!(name: "Alice"),
-        follower: User.new!(name: "Charlie")
-      )
-
+    expected_follow_request = FollowUserRequest.new!(followee: "Alice", follower: "Charlie")
     assert_receive ^expected_follow_request
   end
 

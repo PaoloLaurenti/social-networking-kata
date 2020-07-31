@@ -11,6 +11,7 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
   alias SocialNetworkingKata.Social.SocialNetworkSupervisor
   alias SocialNetworkingKata.Social.Timeline
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
+  alias SocialNetworkingKata.Social.Users.User
   alias SocialNetworkingKata.Social.Users.VolatileUsersRepository
   alias SocialNetworkingKata.Social.Wall
   alias SocialNetworkingKata.Social.Wall.Entry
@@ -27,44 +28,48 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
 
   @spec publish_message(PublishMessageRequest.t(), opts :: keyword()) :: :ok
   def publish_message(
-        %PublishMessageRequest{user: user, message: %MessageToPublish{text: message_text}},
+        %PublishMessageRequest{
+          username: username,
+          message: %MessageToPublish{text: message_text}
+        },
         opts
       ) do
     clock = Keyword.get(opts, :clock, SocialNetworkingKata.Time.UTCClock)
     {:ok, now} = clock.get_current_datetime()
-    res = SocialNetworkSupervisor.start_user(user)
+    res = SocialNetworkSupervisor.start_user(username)
 
     case res do
       {:ok, _} ->
         message = Message.new!(text: message_text, sent_at: now)
-        VolatileMessagesRepository.add_user_message(user, message)
+        VolatileMessagesRepository.add_user_message(username, message)
 
       {:error, {:already_started, _}} ->
         message = Message.new!(text: message_text, sent_at: now)
-        VolatileMessagesRepository.add_user_message(user, message)
+        VolatileMessagesRepository.add_user_message(username, message)
     end
   end
 
   @spec get_timeline(GetTimelineRequest.t()) :: {:ok, Timeline.t()}
-  def get_timeline(%GetTimelineRequest{user: user}) do
-    res = SocialNetworkSupervisor.start_user(user)
+  def get_timeline(%GetTimelineRequest{username: username}) do
+    res = SocialNetworkSupervisor.start_user(username)
+    user = User.new!(name: username)
 
     case res do
       {:ok, _} ->
-        {:ok, messages} = VolatileMessagesRepository.get_user_messages(user.name)
-        {:ok, %Timeline{user: user, messages: messages}}
+        {:ok, messages} = VolatileMessagesRepository.get_user_messages(username)
+        {:ok, Timeline.new!(user: user, messages: messages)}
 
       {:error, {:already_started, _}} ->
-        {:ok, messages} = VolatileMessagesRepository.get_user_messages(user.name)
-        {:ok, %Timeline{user: user, messages: messages}}
+        {:ok, messages} = VolatileMessagesRepository.get_user_messages(username)
+        {:ok, Timeline.new!(user: user, messages: messages)}
     end
   end
 
   @spec follow_user(request :: FollowUserRequest.t()) :: :ok
-  def follow_user(%FollowUserRequest{followee: followee, follower: follower}) do
+  def follow_user(%FollowUserRequest{followee: followeeUsername, follower: followerUsername}) do
     VolatileUsersRepository.upsert_user_followings(
-      followeeUsername: followee.name,
-      followerUsername: follower.name
+      followeeUsername: followeeUsername,
+      followerUsername: followerUsername
     )
   end
 

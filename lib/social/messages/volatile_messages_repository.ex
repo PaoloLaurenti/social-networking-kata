@@ -15,20 +15,19 @@ defmodule SocialNetworkingKata.Social.Messages.VolatileMessagesRepository do
   use GenServer
   alias SocialNetworkingKata.ServicesNamesResolver
   alias SocialNetworkingKata.Social.Messages.Message
-  alias SocialNetworkingKata.Social.Users.User
 
   @typep requests :: {:add_user_message, Message.t()} | :get_messages
   @typep responses :: {:reply, :ok, State.t()} | {:reply, {:ok, [Message.t()]}, State.t()}
 
-  @spec start_link(user: User.t()) ::
+  @spec start_link(username: String.t()) ::
           :ignore | {:error, any} | {:ok, pid}
-  def start_link(user: %User{name: name}) do
-    GenServer.start_link(__MODULE__, [], name: server_name(name))
+  def start_link(username: username) do
+    GenServer.start_link(__MODULE__, [], name: server_name(username))
   end
 
-  @spec add_user_message(User.t(), Message.t()) :: :ok
-  def add_user_message(%User{name: name}, %Message{} = message) do
-    GenServer.call(server_name(name), {:add_user_message, message})
+  @spec add_user_message(username :: String.t(), message :: Message.t()) :: :ok
+  def add_user_message(username, %Message{} = message) do
+    GenServer.call(server_name(username), {:add_user_message, message})
   end
 
   @spec get_user_messages(username :: String.t()) :: {:ok, [Message.t()]}

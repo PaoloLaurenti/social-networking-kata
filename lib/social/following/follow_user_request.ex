@@ -4,11 +4,10 @@ defmodule SocialNetworkingKata.Social.Following.FollowUserRequest do
   """
 
   use Domo
-  alias SocialNetworkingKata.Social.Users.User
 
   @typedoc "A follow user request"
   typedstruct do
-    field :followee, User.t()
-    field :follower, User.t()
+    field :followee, String.t()
+    field :follower, String.t()
   end
 end

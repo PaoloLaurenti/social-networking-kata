@@ -9,7 +9,6 @@ defmodule SocialNetworkingKata.Cli do
   alias SocialNetworkingKata.Social.SocialNetwork
   alias SocialNetworkingKata.Social.Timeline
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
-  alias SocialNetworkingKata.Social.Users.User
   alias SocialNetworkingKata.Social.VolatileSocialNetwork
   alias SocialNetworkingKata.Social.Wall
   alias SocialNetworkingKata.Social.Wall.Entry
@@ -105,18 +104,18 @@ defmodule SocialNetworkingKata.Cli do
       publish_message_data != nil ->
         {:req,
          PublishMessageRequest.new!(
-           user: User.new!(name: publish_message_data["name"]),
+           username: publish_message_data["name"],
            message: MessageToPublish.new!(text: publish_message_data["text"])
          )}
 
       get_timeline_data != nil ->
-        {:req, GetTimelineRequest.new!(user: User.new!(name: get_timeline_data["name"]))}
+        {:req, GetTimelineRequest.new!(username: get_timeline_data["name"])}
 
       follow_user_data != nil ->
         {:req,
          FollowUserRequest.new!(
-           followee: User.new!(name: follow_user_data["followee"]),
-           follower: User.new!(name: follow_user_data["follower"])
+           followee: follow_user_data["followee"],
+           follower: follow_user_data["follower"]
          )}
 
       get_wall_data != nil ->
