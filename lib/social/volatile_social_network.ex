@@ -5,7 +5,6 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
   alias SocialNetworkingKata.Social.Following.FollowUserRequest
   alias SocialNetworkingKata.Social.Messages.Message
   alias SocialNetworkingKata.Social.Messages.VolatileMessagesRepository
-  alias SocialNetworkingKata.Social.Publishing.Message, as: MessageToPublish
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
   alias SocialNetworkingKata.Social.SocialNetwork
   alias SocialNetworkingKata.Social.SocialNetworkSupervisor
@@ -27,13 +26,7 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
   end
 
   @spec publish_message(PublishMessageRequest.t(), opts :: keyword()) :: :ok
-  def publish_message(
-        %PublishMessageRequest{
-          username: username,
-          message: %MessageToPublish{text: message_text}
-        },
-        opts
-      ) do
+  def publish_message(%PublishMessageRequest{username: username, message: message_text}, opts) do
     clock = Keyword.get(opts, :clock, SocialNetworkingKata.Time.UTCClock)
     {:ok, now} = clock.get_current_datetime()
     res = SocialNetworkSupervisor.start_user(username)

@@ -4,7 +4,6 @@ defmodule SocialNetworkingKata.Cli do
   """
   alias SocialNetworkingKata.Social.Following.FollowUserRequest
   alias SocialNetworkingKata.Social.Messages.Message
-  alias SocialNetworkingKata.Social.Publishing.Message, as: MessageToPublish
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
   alias SocialNetworkingKata.Social.SocialNetwork
   alias SocialNetworkingKata.Social.Timeline
@@ -105,7 +104,7 @@ defmodule SocialNetworkingKata.Cli do
         {:req,
          PublishMessageRequest.new!(
            username: publish_message_data["name"],
-           message: MessageToPublish.new!(text: publish_message_data["text"])
+           message: publish_message_data["text"]
          )}
 
       get_timeline_data != nil ->

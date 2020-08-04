@@ -6,7 +6,6 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
 
   alias SocialNetworkingKata.Social.Following.FollowUserRequest
   alias SocialNetworkingKata.Social.Messages.Message
-  alias SocialNetworkingKata.Social.Publishing.Message, as: MessageToPublish
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
   alias SocialNetworkingKata.Social.Timeline
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
@@ -31,8 +30,9 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
   end
 
   test "publish message returns successfull result" do
-    message = MessageToPublish.new!(text: "Some message content")
-    publish_message_req = PublishMessageRequest.new!(username: "Alice", message: message)
+    publish_message_req =
+      PublishMessageRequest.new!(username: "Alice", message: "Some message content")
+
     result = VolatileSocialNetwork.publish_message(publish_message_req)
 
     assert result === :ok
@@ -51,19 +51,13 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
     stub(ClockMock, :get_current_datetime, fn -> {:ok, four_minutes_and_something_ago} end)
 
     :ok =
-      PublishMessageRequest.new!(
-        username: "Alice",
-        message: MessageToPublish.new!(text: "Some message content")
-      )
+      PublishMessageRequest.new!(username: "Alice", message: "Some message content")
       |> VolatileSocialNetwork.publish_message(clock: ClockMock)
 
     stub(ClockMock, :get_current_datetime, fn -> {:ok, less_than_one_minute_ago} end)
 
     :ok =
-      PublishMessageRequest.new!(
-        username: "Alice",
-        message: MessageToPublish.new!(text: "Some other message content")
-      )
+      PublishMessageRequest.new!(username: "Alice", message: "Some other message content")
       |> VolatileSocialNetwork.publish_message(clock: ClockMock)
 
     result = GetTimelineRequest.new!(username: "Alice") |> VolatileSocialNetwork.get_timeline()
@@ -100,19 +94,13 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
     stub(ClockMock, :get_current_datetime, fn -> {:ok, four_minutes_and_something_ago} end)
 
     :ok =
-      PublishMessageRequest.new!(
-        username: "Alice",
-        message: MessageToPublish.new!(text: "I love the weather today")
-      )
+      PublishMessageRequest.new!(username: "Alice", message: "I love the weather today")
       |> VolatileSocialNetwork.publish_message(clock: ClockMock)
 
     stub(ClockMock, :get_current_datetime, fn -> {:ok, less_than_one_minute_ago} end)
 
     :ok =
-      PublishMessageRequest.new!(
-        username: "Charlie",
-        message: MessageToPublish.new!(text: "I'm in New York today!")
-      )
+      PublishMessageRequest.new!(username: "Charlie", message: "I'm in New York today!")
       |> VolatileSocialNetwork.publish_message(clock: ClockMock)
 
     FollowUserRequest.new!(followee: "Alice", follower: "Charlie")

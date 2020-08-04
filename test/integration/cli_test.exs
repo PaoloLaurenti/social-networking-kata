@@ -7,7 +7,6 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
 
   alias SocialNetworkingKata.Social.Following.FollowUserRequest
   alias SocialNetworkingKata.Social.Messages.Message
-  alias SocialNetworkingKata.Social.Publishing.Message, as: MessageToPublish
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
   alias SocialNetworkingKata.Social.Timeline
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
@@ -47,7 +46,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
     expected_publish_request =
       PublishMessageRequest.new!(
         username: "Alice",
-        message: MessageToPublish.new!(text: "I love the weather today")
+        message: "I love the weather today"
       )
 
     assert_receive ^expected_publish_request

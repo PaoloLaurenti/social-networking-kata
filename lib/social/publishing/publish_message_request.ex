@@ -4,11 +4,10 @@ defmodule SocialNetworkingKata.Social.Publishing.PublishMessageRequest do
   """
 
   use Domo
-  alias SocialNetworkingKata.Social.Publishing.Message
 
   @typedoc "A publish message request"
   typedstruct do
     field :username, String.t()
-    field :message, Message.t()
+    field :message, String.t()
   end
 end
