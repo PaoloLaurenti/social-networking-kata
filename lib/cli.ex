@@ -7,7 +7,7 @@ defmodule SocialNetworkingKata.Cli do
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
   alias SocialNetworkingKata.Social.SocialNetwork
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
-  alias SocialNetworkingKata.Social.TimelineResponse
+  alias SocialNetworkingKata.Social.Timeline.GetTimelineResponse
   alias SocialNetworkingKata.Social.VolatileSocialNetwork
   alias SocialNetworkingKata.Social.Wall
   alias SocialNetworkingKata.Social.Wall.Entry
@@ -127,7 +127,7 @@ defmodule SocialNetworkingKata.Cli do
 
   defp to_text(:ok), do: [""]
 
-  defp to_text({:ok, timeline = %TimelineResponse{}}, clock) do
+  defp to_text({:ok, timeline = %GetTimelineResponse{}}, clock) do
     timeline.messages
     |> Enum.sort_by(& &1.sent_at, {:desc, DateTime})
     |> Enum.map(fn m -> to_text(m, clock) end)

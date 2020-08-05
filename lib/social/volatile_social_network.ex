@@ -9,7 +9,7 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
   alias SocialNetworkingKata.Social.SocialNetwork
   alias SocialNetworkingKata.Social.SocialNetworkSupervisor
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
-  alias SocialNetworkingKata.Social.TimelineResponse
+  alias SocialNetworkingKata.Social.Timeline.GetTimelineResponse
   alias SocialNetworkingKata.Social.Users.User
   alias SocialNetworkingKata.Social.Users.VolatileUsersRepository
   alias SocialNetworkingKata.Social.Wall
@@ -42,7 +42,7 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
     end
   end
 
-  @spec get_timeline(GetTimelineRequest.t()) :: {:ok, TimelineResponse.t()}
+  @spec get_timeline(GetTimelineRequest.t()) :: {:ok, GetTimelineResponse.t()}
   def get_timeline(%GetTimelineRequest{username: username}) do
     res = SocialNetworkSupervisor.start_user(username)
     user = User.new!(name: username)
@@ -50,11 +50,11 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
     case res do
       {:ok, _} ->
         {:ok, messages} = VolatileMessagesRepository.get_user_messages(username)
-        {:ok, TimelineResponse.new!(user: user, messages: messages)}
+        {:ok, GetTimelineResponse.new!(user: user, messages: messages)}
 
       {:error, {:already_started, _}} ->
         {:ok, messages} = VolatileMessagesRepository.get_user_messages(username)
-        {:ok, TimelineResponse.new!(user: user, messages: messages)}
+        {:ok, GetTimelineResponse.new!(user: user, messages: messages)}
     end
   end
 

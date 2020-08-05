@@ -1,4 +1,4 @@
-defmodule SocialNetworkingKata.Social.Timeline.GetGetTimelineResponseUser do
+defmodule SocialNetworkingKata.Social.Timeline.GetTimelineResponseUser do
   @moduledoc """
   A struct representing an user of a get timeline response.
   """

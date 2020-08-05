@@ -9,7 +9,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
   alias SocialNetworkingKata.Social.Messages.Message
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
-  alias SocialNetworkingKata.Social.TimelineResponse
+  alias SocialNetworkingKata.Social.Timeline.GetTimelineResponse
   alias SocialNetworkingKata.Social.Users.User
   alias SocialNetworkingKata.Social.Wall
   alias SocialNetworkingKata.Social.Wall.Entry
@@ -65,7 +65,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
       send(parent, {ref, req})
 
       {:ok,
-       TimelineResponse.new!(
+       GetTimelineResponse.new!(
          user: User.new!(name: "Alice"),
          messages: [
            Message.new!(text: "Some older message", sent_at: four_minutes_and_something_ago),
@@ -208,7 +208,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
 
     stub(SocialNetworkServerMock, :get_timeline, fn _req ->
       {:ok,
-       TimelineResponse.new!(
+       GetTimelineResponse.new!(
          user: User.new!(name: "Alice"),
          messages: timeline_messages
        )}
