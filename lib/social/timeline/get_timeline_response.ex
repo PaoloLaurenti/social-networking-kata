@@ -5,11 +5,11 @@ defmodule SocialNetworkingKata.Social.Timeline.GetTimelineResponse do
 
   use Domo
   alias SocialNetworkingKata.Social.Messages.Message
-  alias SocialNetworkingKata.Social.Users.User
+  alias SocialNetworkingKata.Social.Timeline.GetTimelineResponseUser
 
   @typedoc "An user timeline"
   typedstruct do
-    field :user, User.t()
+    field :user, GetTimelineResponseUser.t()
     field :messages, [Message.t()]
   end
 end

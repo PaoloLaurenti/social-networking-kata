@@ -9,7 +9,7 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
   alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
   alias SocialNetworkingKata.Social.Timeline.GetTimelineResponse
-  alias SocialNetworkingKata.Social.Users.User
+  alias SocialNetworkingKata.Social.Timeline.GetTimelineResponseUser
   alias SocialNetworkingKata.Social.VolatileSocialNetwork
   alias SocialNetworkingKata.Social.Wall
   alias SocialNetworkingKata.Social.Wall.Entry
@@ -42,7 +42,8 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
     result = GetTimelineRequest.new!(username: "Alice") |> VolatileSocialNetwork.get_timeline()
 
     expected_result =
-      {:ok, GetTimelineResponse.new!(user: User.new!(name: "Alice"), messages: [])}
+      {:ok,
+       GetTimelineResponse.new!(user: GetTimelineResponseUser.new!(name: "Alice"), messages: [])}
 
     assert result === expected_result
   end
@@ -68,7 +69,7 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
     expected_result =
       {:ok,
        GetTimelineResponse.new!(
-         user: User.new!(name: "Alice"),
+         user: GetTimelineResponseUser.new!(name: "Alice"),
          messages: [
            Message.new!(text: "Some message content", sent_at: four_minutes_and_something_ago),
            Message.new!(text: "Some other message content", sent_at: less_than_one_minute_ago)
