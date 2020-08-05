@@ -8,8 +8,8 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
   alias SocialNetworkingKata.Social.SocialNetwork
   alias SocialNetworkingKata.Social.SocialNetworkSupervisor
+  alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
   alias SocialNetworkingKata.Social.TimelineResponse
-  alias SocialNetworkingKata.Social.TimelineResponse.GetTimelineRequest
   alias SocialNetworkingKata.Social.Users.User
   alias SocialNetworkingKata.Social.Users.VolatileUsersRepository
   alias SocialNetworkingKata.Social.Wall

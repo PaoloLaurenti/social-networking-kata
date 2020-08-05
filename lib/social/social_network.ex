@@ -4,8 +4,8 @@ defmodule SocialNetworkingKata.Social.SocialNetwork do
   """
   alias SocialNetworkingKata.Social.Following.FollowUserRequest
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
+  alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
   alias SocialNetworkingKata.Social.TimelineResponse
-  alias SocialNetworkingKata.Social.TimelineResponse.GetTimelineRequest
   alias SocialNetworkingKata.Social.Wall
   alias SocialNetworkingKata.Social.Wall.GetWallRequest
 
