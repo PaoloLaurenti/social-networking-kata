@@ -7,8 +7,8 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
   alias SocialNetworkingKata.Social.Following.FollowUserRequest
   alias SocialNetworkingKata.Social.Messages.Message
   alias SocialNetworkingKata.Social.Publishing.PublishMessageRequest
-  alias SocialNetworkingKata.Social.Timeline
-  alias SocialNetworkingKata.Social.Timeline.GetTimelineRequest
+  alias SocialNetworkingKata.Social.TimelineResponse
+  alias SocialNetworkingKata.Social.TimelineResponse.GetTimelineRequest
   alias SocialNetworkingKata.Social.Users.User
   alias SocialNetworkingKata.Social.VolatileSocialNetwork
   alias SocialNetworkingKata.Social.Wall
@@ -40,7 +40,7 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
 
   test "get timeline of an unknown user returns an empty timeline" do
     result = GetTimelineRequest.new!(username: "Alice") |> VolatileSocialNetwork.get_timeline()
-    expected_result = {:ok, Timeline.new!(user: User.new!(name: "Alice"), messages: [])}
+    expected_result = {:ok, TimelineResponse.new!(user: User.new!(name: "Alice"), messages: [])}
     assert result === expected_result
   end
 
@@ -64,7 +64,7 @@ defmodule SocialNetworkingKata.Test.Unit.VolatileSocialNetworkTest do
 
     expected_result =
       {:ok,
-       Timeline.new!(
+       TimelineResponse.new!(
          user: User.new!(name: "Alice"),
          messages: [
            Message.new!(text: "Some message content", sent_at: four_minutes_and_something_ago),

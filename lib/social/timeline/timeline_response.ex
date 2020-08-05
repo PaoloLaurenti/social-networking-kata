@@ -1,4 +1,4 @@
-defmodule SocialNetworkingKata.Social.Timeline do
+defmodule SocialNetworkingKata.Social.TimelineResponse do
   @moduledoc """
   A struct representing an user timeline.
   """
