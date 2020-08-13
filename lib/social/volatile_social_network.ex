@@ -76,7 +76,7 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
         {:ok, messages} = VolatileMessagesRepository.get_user_messages(followed_username)
 
         Enum.map(messages, fn m ->
-          entry_user = EntryUser.new!(name: followed_username)
+          entry_user = EntryUser.new!(username: followed_username)
           Entry.new!(user: entry_user, message: m)
         end)
       end)
@@ -85,7 +85,7 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
 
     user_entries =
       Enum.map(messages, fn m ->
-        entry_user = EntryUser.new!(name: username)
+        entry_user = EntryUser.new!(username: username)
         Entry.new!(user: entry_user, message: m)
       end)
 
@@ -94,7 +94,7 @@ defmodule SocialNetworkingKata.Social.VolatileSocialNetwork do
       |> Enum.concat(followed_users_entries)
       |> Enum.sort_by(& &1.message.sent_at, {:asc, DateTime})
 
-    wall_user = WallUser.new!(name: username)
+    wall_user = WallUser.new!(username: username)
     {:ok, Wall.new!(user: wall_user, entries: entries)}
   end
 end

@@ -7,6 +7,6 @@ defmodule SocialNetworkingKata.Social.Wall.EntryUser do
 
   @typedoc "A wall entry user"
   typedstruct do
-    field :name, String.t()
+    field :username, String.t()
   end
 end

@@ -167,15 +167,15 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
 
       charlie_wall =
         Wall.new!(
-          user: WallUser.new!(name: "Charlie"),
+          user: WallUser.new!(username: "Charlie"),
           entries: [
             Entry.new!(
-              user: EntryUser.new!(name: "Charlie"),
+              user: EntryUser.new!(username: "Charlie"),
               message:
                 Message.new!(text: "I'm in New York today!", sent_at: less_than_one_minute_ago)
             ),
             Entry.new!(
-              user: EntryUser.new!(name: "Alice"),
+              user: EntryUser.new!(username: "Alice"),
               message:
                 Message.new!(
                   text: "I love the weather today",

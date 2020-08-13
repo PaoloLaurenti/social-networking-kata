@@ -168,7 +168,7 @@ defmodule SocialNetworkingKata.Cli do
       |> Enum.find(fn secs_to_text -> secs_to_text.predicate.(seconds_ago) end)
 
     {time_ago, unit} = secs_to_text.apply.(seconds_ago)
-    "#{user.name} - #{message.text} (#{time_ago} #{unit} ago)"
+    "#{user.username} - #{message.text} (#{time_ago} #{unit} ago)"
   end
 
   defp secs_to_text_config do
