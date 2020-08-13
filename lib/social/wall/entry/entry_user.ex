@@ -1,4 +1,4 @@
-defmodule SocialNetworkingKata.Social.Wall.EntryUser do
+defmodule SocialNetworkingKata.Social.Wall.Entry.User do
   @moduledoc """
   A struct representing an user of a wall entry.
   """

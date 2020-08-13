@@ -13,7 +13,7 @@ defmodule SocialNetworkingKata.Test.Integration.CliTest do
   alias SocialNetworkingKata.Social.Timeline.GetTimelineResponseUser
   alias SocialNetworkingKata.Social.Wall
   alias SocialNetworkingKata.Social.Wall.Entry
-  alias SocialNetworkingKata.Social.Wall.EntryUser
+  alias SocialNetworkingKata.Social.Wall.Entry.User, as: EntryUser
   alias SocialNetworkingKata.Social.Wall.GetWallRequest
   alias SocialNetworkingKata.Social.Wall.User, as: WallUser
 
