@@ -2,14 +2,14 @@ defmodule SocialNetworkingKata.Social.Users.VolatileUsersRepository do
   @moduledoc """
   The volatile repository of all the users of the Social Network
   """
-  alias SocialNetworkingKata.Social.Users.UserEntity
+  alias SocialNetworkingKata.Social.Users.User
 
   defmodule State do
     @moduledoc false
     use Domo
 
     typedstruct do
-      field :users, %{optional(String.t()) => UserEntity.t()}
+      field :users, %{optional(String.t()) => User.t()}
     end
   end
 
@@ -20,7 +20,7 @@ defmodule SocialNetworkingKata.Social.Users.VolatileUsersRepository do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  @spec get_user(username :: String.t()) :: {:ok, UserEntity.t()}
+  @spec get_user(username :: String.t()) :: {:ok, User.t()}
   def get_user(username) do
     GenServer.call(__MODULE__, {:get_user, username})
   end
@@ -41,7 +41,7 @@ defmodule SocialNetworkingKata.Social.Users.VolatileUsersRepository do
 
   @impl true
   @spec handle_call({:get_user, String.t()}, from :: GenServer.from(), State.t()) ::
-          {:reply, {:ok, UserEntity.t()}, State.t()}
+          {:reply, {:ok, User.t()}, State.t()}
   def handle_call({:get_user, username}, _from, %State{users: users} = state) do
     user = users[username]
     {:reply, {:ok, user}, state}
@@ -59,10 +59,9 @@ defmodule SocialNetworkingKata.Social.Users.VolatileUsersRepository do
         _from,
         %State{users: users} = state
       ) do
-    user =
-      users[followerUsername] || UserEntity.new!(name: followerUsername, followed_usernames: [])
+    user = users[followerUsername] || User.new!(name: followerUsername, followed_usernames: [])
 
-    updated_user = %UserEntity{
+    updated_user = %User{
       user
       | followed_usernames: [followeeUsername | user.followed_usernames]
     }
